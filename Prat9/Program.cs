@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Prat9
@@ -8,18 +8,190 @@ namespace Prat9
     {
         static void Main(string[] args)
         {
-            DemoContext context = new DemoContext();
-            // context.Database.EnsureCreated();
+            StudentRepository repository = new StudentRepository();
 
-            //CreateDemo(context);
-            //FechData(context);
-            //updateDemo(context);
-            //DeleteDemo(context);
 
-            Console.ReadKey();
+
+            while (true)
+            {
+                Menu();
+                string select = Console.ReadLine();
+                switch (select)
+                {
+                    case "1":
+                        {
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine();
+                            Console.WriteLine("Create Page");
+                            Console.WriteLine();
+                            Console.WriteLine(new string('_', 80));
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.WriteLine();
+                            Console.WriteLine("Enter Name");
+                            Console.WriteLine();
+                            string name = Console.ReadLine();
+                            Console.WriteLine();
+                            Console.WriteLine("Enter Surname");
+                            Console.WriteLine();
+                            string surname = Console.ReadLine();
+                            Console.WriteLine();
+                            Console.WriteLine("Enter Age ");
+                            int age = int.Parse(Console.ReadLine());
+                            Student student = new Student()
+                            {
+                                Age = age,
+                                Name = name,
+                                Surename = surname
+                            };
+                            repository.AddStudent(student);
+                        }
+                        break;
+                    case "2":
+                        {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine();
+                        Console.WriteLine("Edit Page");
+                        Console.WriteLine();
+                        Console.WriteLine(new string('_', 80));
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine();
+                        Console.WriteLine("Enter Search");
+                        string search = Console.ReadLine();
+                         Student student=  repository.FindBySurname(search);
+                            if (student!=null)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("Enter New Name");
+                                Console.WriteLine();
+                                string name = Console.ReadLine();
+                                Console.WriteLine();
+                                Console.WriteLine("Enter New Surname");
+                                Console.WriteLine();
+                                string surname = Console.ReadLine();
+                                Console.WriteLine();
+                                Console.WriteLine("Enter New Age ");
+                                int age = int.Parse(Console.ReadLine());
+                                Student updatedStudent = new Student()
+                                {
+                                    StudentId= student.StudentId,
+                                    Age = age,
+                                    Name = name,
+                                    Surename = surname
+                                };
+                                repository.UpdateStudent(updatedStudent);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Student Not Found");
+                                Console.ReadKey();
+                            }
+                        }
+                       
+                        break;
+                    case "3":
+                        {
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine();
+                            Console.WriteLine("Delete Page");
+                            Console.WriteLine();
+                            Console.WriteLine(new string('_', 80));
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.WriteLine();
+                            Console.WriteLine("Enter Search");
+                            string search = Console.ReadLine();
+                            Student student = repository.FindBySurname(search);
+                            if (student != null)
+                            {
+                               
+                                repository.DeleteStudent(student);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Student Not Found");
+                                Console.ReadKey();
+                            }
+                        }
+                        break;
+                    case "4":
+                        {
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine();
+                            Console.WriteLine("Print Page");
+                            Console.WriteLine();
+                            Console.WriteLine(new string('_', 80));
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.WriteLine();
+                            List<Student> students = repository.GetAll();
+                            foreach (var item in students)
+                            {
+                                Console.WriteLine($"name    = {item.Name}");
+                                Console.WriteLine($"surname = {item.Surename}");
+                                Console.WriteLine($"age     = {item.Age}");
+                                Console.WriteLine(new string('*', 40));
+                            }
+                            Console.ReadKey();
+                        }
+
+                        break;
+                    case "5":
+                       
+                        break;
+                    case "6":
+                        return;
+
+                    default:
+                        Console.WriteLine("Try Again");
+                        Console.ReadKey();
+                        break;
+                }
+            }
+
+
         }
 
-        private static void DeleteDemo(DemoContext context)
+        private static void Menu()
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine();
+            Console.WriteLine("School Demo");
+            Console.WriteLine();
+            Console.WriteLine(new string('_', 80));
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine();
+            Console.WriteLine("1)Add student");
+            Console.WriteLine();
+            Console.WriteLine("2)Edit student");
+            Console.WriteLine();
+            Console.WriteLine("3)Delete student");
+            Console.WriteLine();
+            Console.WriteLine("4)Print students");
+            Console.WriteLine();
+            Console.WriteLine("5)search student");
+            Console.WriteLine();
+            Console.WriteLine("6)Exit");
+            Console.WriteLine();
+
+        }
+
+    
+
+    
+
+   
+
+     
+
+   
+
+
+
+#region efDemo
+private static void DeleteDemo(DemoContext context)
         {
             Student student = context.Students.Find(3);
             context.Students.Remove(student);
@@ -57,23 +229,7 @@ namespace Prat9
             context.Students.Add(student);
             context.SaveChanges();
         }
-    }
 
-    public class DemoContext:DbContext 
-    {
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-           string connectionString="Server=.;Database=CSDEMO;Trusted_Connection=True";
-            optionsBuilder.UseSqlServer(connectionString);
-        }
-        public DbSet<Student> Students { get; set; }
-    }
-
-   public class Student
-    {
-        public int StudentId { get; set; }
-        public string Name { get; set; }
-        public string Surename { get; set; }
-        public int Age { get; set; }
+        #endregion
     }
 }
